@@ -1,0 +1,36 @@
+[
+  {
+    "id": "class_1776721189076_5437",
+    "topic": "Introduction to Programming",
+    "year": 2026,
+    "semester": 1,
+    "name": "Introduction to Programming - 2026 S1",
+    "studentCpfs": [
+      "258.147.369-99",
+      "123.983.123-00",
+      "753.951.852-44"
+    ],
+    "goals": [
+      "Requirements",
+      "Tests"
+    ]
+  },
+  {
+    "id": "class_1776723016560_77075",
+    "topic": "Introduction to Programming 2",
+    "year": 2026,
+    "semester": 2,
+    "name": "Introduction to Programming 2 - 2026 S2",
+    "studentCpfs": [
+      "963.852.741-22",
+      "123.983.123-00",
+      "321.654.987-10",
+      "987.123.456-22",
+      "159.357.258-33"
+    ],
+    "goals": [
+      "Requirements",
+      "Tests"
+    ]
+  }
+]
