@@ -3,6 +3,7 @@ import { EvaluationCode } from './evaluation';
 export interface PendingEmailChange {
   studentCpf: string;
   studentEmail: string;
+  studentName: string;
   className: string;
   goal: string;
   oldCode: EvaluationCode;

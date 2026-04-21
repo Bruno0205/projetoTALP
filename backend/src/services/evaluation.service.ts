@@ -58,6 +58,7 @@ export default class EvaluationService {
       await this.emailService.queueChange({
         studentCpf: input.studentCpf,
         studentEmail: student.email,
+        studentName: student.fullName,
         className: classroom.name,
         goal: input.goal,
         oldCode: existing?.code ?? 'MANA',

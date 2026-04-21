@@ -79,3 +79,36 @@ npm run preview
   - `backend/data/evaluations.json`
   - `backend/data/emailQueue.json`
   - `backend/data/emailLog.json`
+
+## EMAIL SETUP (GMAIL)
+
+The backend sends real emails through Gmail SMTP when you trigger End of Day.
+
+1. Enable 2FA on your Google account
+
+- Go to Google Account settings.
+- Open Security.
+- Enable 2-Step Verification.
+
+2. Generate an App Password
+
+- In Security, open App passwords.
+- Select app type Mail (or Custom name) and generate.
+- Copy the generated 16-character password.
+
+3. Configure backend environment variables
+
+Create a `.env` file inside `backend/` with:
+
+```bash
+EMAIL_USER=your-gmail-address@gmail.com
+EMAIL_PASS=your-16-char-app-password
+```
+
+4. Test with End of Day button
+
+- Start backend and frontend.
+- Create or update evaluations for one or more students.
+- Click End of Day in the frontend header.
+- One consolidated email is sent per student with all pending updates.
+- If no updates exist since the last trigger, no email is sent.

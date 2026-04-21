@@ -10,6 +10,15 @@ function buildClassName(topic: string, year: number, semester: number): string {
   return `${topic} - ${year} S${semester}`;
 }
 
+function sanitizeGoals(goals: string[]): string[] {
+  const cleaned = goals.map(goal => goal.trim()).filter(Boolean);
+  const unique = Array.from(new Set(cleaned));
+  if (unique.length === 0) {
+    throw new Error('At least one goal is required');
+  }
+  return unique;
+}
+
 export default class ClassService {
   private classRepo = new ClassRepository();
   private studentRepo = new StudentRepository();
@@ -55,7 +64,7 @@ export default class ClassService {
       semester: input.semester,
       name,
       studentCpfs,
-      goals: (input.goals && input.goals.length > 0 ? input.goals : DEFAULT_GOALS).map(g => g.trim())
+      goals: sanitizeGoals(input.goals && input.goals.length > 0 ? input.goals : DEFAULT_GOALS)
     };
 
     return this.classRepo.create(classroom);
@@ -81,7 +90,8 @@ export default class ClassService {
       topic: topic.trim(),
       year,
       semester,
-      name: buildClassName(topic.trim(), year, semester)
+      name: buildClassName(topic.trim(), year, semester),
+      goals: payload.goals ? sanitizeGoals(payload.goals) : current.goals
     };
 
     return this.classRepo.update(id, next);
@@ -115,9 +125,21 @@ export default class ClassService {
   }
 
   async removeStudent(id: string, cpf: string): Promise<Classroom> {
+    if (!cpf || !cpf.trim()) {
+      throw new Error('CPF is required');
+    }
+
     const current = await this.classRepo.findById(id);
     if (!current) throw new Error('Class not found');
-    current.studentCpfs = current.studentCpfs.filter(item => item !== cpf);
-    return this.classRepo.update(id, current);
+
+    const normalizedCpf = cpf.trim();
+    if (!current.studentCpfs.includes(normalizedCpf)) {
+      throw new Error(`Student with CPF ${normalizedCpf} is not enrolled in ${current.name}`);
+    }
+
+    current.studentCpfs = current.studentCpfs.filter(item => item !== normalizedCpf);
+    const updated = await this.classRepo.update(id, current);
+    await this.evaluationRepo.deleteByClassAndStudent(id, normalizedCpf);
+    return updated;
   }
 }

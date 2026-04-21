@@ -20,6 +20,7 @@ export default function ClassDetailPage() {
   const [enrollCpf, setEnrollCpf] = useState('');
   const [selectedGoal, setSelectedGoal] = useState('Requirements');
   const [selectedCode, setSelectedCode] = useState<EvaluationCode>('MANA');
+  const [newGoal, setNewGoal] = useState('');
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
 
@@ -114,6 +115,48 @@ export default function ClassDetailPage() {
     }
   }
 
+  async function onRemoveStudent(cpf: string) {
+    if (!id) return;
+    setError('');
+    setSuccessMessage('');
+
+    try {
+      await api.removeStudentFromClass(id, cpf);
+      await load();
+      setSuccessMessage(`Student ${cpf} removed from class.`);
+    } catch (err: any) {
+      setError(err.message);
+    }
+  }
+
+  async function onAddGoal(e: FormEvent) {
+    e.preventDefault();
+    if (!id || !classroom) return;
+    setError('');
+    setSuccessMessage('');
+
+    const goal = newGoal.trim();
+    if (!goal) {
+      setError('Goal name is required.');
+      return;
+    }
+
+    if (classroom.goals.includes(goal)) {
+      setError('This goal already exists in the class.');
+      return;
+    }
+
+    try {
+      await api.updateClass(id, { goals: [...classroom.goals, goal] });
+      setNewGoal('');
+      await load();
+      setSelectedGoal(goal);
+      setSuccessMessage(`Goal ${goal} added successfully.`);
+    } catch (err: any) {
+      setError(err.message);
+    }
+  }
+
   if (!classroom) return <p>Loading...</p>;
 
   const availableStudents = allStudents.filter(student => !classroom.studentCpfs.includes(student.cpf));
@@ -136,6 +179,23 @@ export default function ClassDetailPage() {
             </select>
             <button className="btn btn-primary" type="submit" disabled={!enrollCpf}>
               Enroll Student
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <div className="glass card">
+        <h3>Add Goal</h3>
+        <form onSubmit={onAddGoal}>
+          <div className="form-row form-row-3">
+            <input
+              className="field"
+              value={newGoal}
+              onChange={e => setNewGoal(e.target.value)}
+              placeholder="New goal name"
+            />
+            <button className="btn btn-primary" type="submit" disabled={!newGoal.trim()}>
+              Add Goal
             </button>
           </div>
         </form>
@@ -184,6 +244,7 @@ export default function ClassDetailPage() {
               {classroom.goals.map(goal => (
                 <th key={goal}>{goal}</th>
               ))}
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -198,6 +259,11 @@ export default function ClassDetailPage() {
                     </span>
                   </td>
                 ))}
+                <td>
+                  <button className="btn btn-danger" type="button" onClick={() => onRemoveStudent(student.cpf)}>
+                    Remove
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>

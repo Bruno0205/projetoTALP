@@ -44,4 +44,12 @@ export default class EvaluationRepository {
     const all = await this.getAll();
     await writeJson(DATA_FILE, all.filter(e => e.studentCpf !== studentCpf));
   }
+
+  async deleteByClassAndStudent(classId: string, studentCpf: string): Promise<void> {
+    const all = await this.getAll();
+    await writeJson(
+      DATA_FILE,
+      all.filter(e => !(e.classId === classId && e.studentCpf === studentCpf))
+    );
+  }
 }
